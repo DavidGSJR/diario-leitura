@@ -1,0 +1,955 @@
+/* =============================================
+   DIÁRIO DE LEITURA — Design System
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ---- Tokens ---- */
+:root {
+  /* Journal Global Theme */
+  --journal-bg: #fae8e8;
+  --journal-font: 'Caveat', cursive;
+  --journal-text: #333333;
+  --journal-text-muted: #888888;
+  --journal-input-bg: rgba(255,255,255,0.4);
+  --journal-border: rgba(0,0,0,0.15);
+
+  --bg:            var(--journal-bg);
+  --bg-card:       var(--journal-input-bg);
+  --bg-modal:      var(--journal-input-bg);
+  --bg-input:      var(--journal-input-bg);
+  --border:        var(--journal-border);
+  --border-focus:  #c97b3a;
+
+  --accent:        #c97b3a;
+  --accent-light:  #e09a5a;
+  --accent-dim:    rgba(201,123,58,.15);
+
+  --text-primary:  #333333;
+  --text-secondary:#555555;
+  --text-muted:    #888888;
+
+  --status-reading:   #4a9eed;
+  --status-done:      #5dbb7a;
+  --status-want:      #9b7de8;
+  --status-dropped:   #e06060;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --shadow-card: 0 4px 24px rgba(0,0,0,.08);
+  --shadow-modal: 0 20px 60px rgba(0,0,0,.15);
+
+  --transition: .2s ease;
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--journal-bg);
+  background-image: radial-gradient(rgba(0,0,0,0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0;
+  background-attachment: fixed;
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  transition: background-color 0.3s ease;
+}
+img { display: block; max-width: 100%; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ================================================
+   HEADER
+   ================================================ */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.4);
+  border-bottom: 2px solid var(--border);
+  padding: 0 clamp(16px, 4vw, 48px);
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.logo-icon {
+  font-size: 26px;
+  line-height: 1;
+}
+.logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  letter-spacing: .02em;
+}
+.logo-text span { color: var(--accent); }
+
+/* ---- Search ---- */
+.search-wrap {
+  flex: 1;
+  max-width: 380px;
+  position: relative;
+}
+.search-wrap svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+#search-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: .875rem;
+  padding: 9px 14px 9px 38px;
+  transition: border-color var(--transition);
+  outline: none;
+}
+#search-input:focus { border-color: var(--border-focus); }
+#search-input::placeholder { color: var(--text-muted); }
+
+/* ---- Add button ---- */
+.btn-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 9px 18px;
+  font-size: .875rem;
+  font-weight: 600;
+  transition: background var(--transition), transform var(--transition);
+  white-space: nowrap;
+}
+.btn-add:hover { background: var(--accent-light); transform: translateY(-1px); }
+.btn-add svg { flex-shrink: 0; }
+
+/* ================================================
+   STATS BAR
+   ================================================ */
+.stats-bar {
+  display: flex;
+  gap: 24px;
+  padding: 16px clamp(16px, 4vw, 48px);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.stats-bar::-webkit-scrollbar { display: none; }
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 70px;
+}
+.stat-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.stat-label {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.stat-divider {
+  width: 1px;
+  background: var(--border);
+  align-self: stretch;
+  margin: 0 4px;
+}
+
+/* ================================================
+   TOOLBAR (filters)
+   ================================================ */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px clamp(16px, 4vw, 48px);
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-secondary);
+  font-size: .8rem;
+  padding: 5px 14px;
+  transition: all var(--transition);
+}
+.filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+.filter-btn.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.toolbar-sep { flex: 1; }
+
+.sort-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: .8rem;
+  padding: 6px 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+.sort-select:focus { border-color: var(--border-focus); }
+.sort-select option { background: #fff; color: #333; }
+
+
+/* view toggle */
+.view-toggle { display: flex; gap: 4px; }
+.view-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+.view-btn.active, .view-btn:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ================================================
+   MAIN CONTENT
+   ================================================ */
+.main {
+  padding: 24px clamp(16px, 4vw, 48px) 60px;
+}
+
+/* ---- Empty state ---- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 24px;
+  text-align: center;
+}
+.empty-icon { font-size: 64px; opacity: .3; }
+.empty-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+}
+.empty-sub { color: var(--text-muted); font-size: .9rem; }
+
+/* ================================================
+   BOOK GRID
+   ================================================ */
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 24px;
+}
+
+/* ---- Book Card ---- */
+.book-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  position: relative;
+}
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card);
+  border-color: var(--accent);
+}
+
+.book-cover-wrap {
+  position: relative;
+  aspect-ratio: 2/3;
+  background: var(--bg-input);
+  overflow: hidden;
+}
+.book-cover-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .4s ease;
+}
+.book-card:hover .book-cover-wrap img { transform: scale(1.04); }
+
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 2.5rem;
+  opacity: 0.6;
+}
+.cover-placeholder span {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+/* status badge on card */
+.card-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: .65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 3px 8px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* media badge */
+.card-media-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: .75rem;
+  padding: 3px 8px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0,0,0,.55);
+}
+
+.badge-reading { background: rgba(74,158,237,.25); color: #4a9eed; border: 1px solid rgba(74,158,237,.4); }
+.badge-done    { background: rgba(93,187,122,.25); color: #5dbb7a; border: 1px solid rgba(93,187,122,.4); }
+.badge-want    { background: rgba(155,125,232,.25); color: #9b7de8; border: 1px solid rgba(155,125,232,.4); }
+.badge-dropped { background: rgba(224,96,96,.25);  color: #e06060; border: 1px solid rgba(224,96,96,.4); }
+
+.book-info {
+  padding: 12px;
+}
+.book-title {
+  font-family: 'Playfair Display', serif;
+  font-size: .95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 4px;
+  /* clamp to 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.book-author {
+  font-size: .78rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-stars { display: flex; gap: 2px; }
+.star { font-size: .85rem; color: var(--text-muted); }
+.star.filled { color: #f5c842; }
+
+/* ================================================
+   LIST VIEW
+   ================================================ */
+.books-list { display: flex; flex-direction: column; gap: 10px; }
+
+.book-row {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px 10px 10px;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.book-row:hover { border-color: var(--accent); background: var(--bg-modal); }
+
+.row-thumb {
+  width: 42px;
+  height: 60px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: var(--bg-input);
+  flex-shrink: 0;
+}
+.row-thumb-placeholder {
+  width: 42px;
+  height: 60px;
+  border-radius: 4px;
+  background: var(--bg-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.row-main { min-width: 0; }
+.row-title {
+  font-family: 'Playfair Display', serif;
+  font-size: .95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row-author { font-size: .78rem; color: var(--text-secondary); margin-bottom: 4px; }
+.row-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.row-badge { font-size: .65rem; }
+
+.row-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.row-stars { display: flex; gap: 1px; }
+.row-stars .star { font-size: .75rem; }
+.row-date { font-size: .72rem; color: var(--text-muted); }
+
+/* ================================================
+   ACTION BUTTONS on card (hover reveal)
+   ================================================ */
+.card-actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,.85));
+  padding: 24px 8px 8px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.book-card:hover .card-actions { opacity: 1; }
+
+.icon-btn {
+  background: rgba(255,255,255,.12);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .85rem;
+  transition: background var(--transition);
+}
+.icon-btn:hover { background: var(--accent); }
+.icon-btn.delete:hover { background: var(--status-dropped); }
+
+/* ================================================
+   JOURNAL MODAL (Redesigned)
+   ================================================ */
+:root {
+  --journal-bg: #fae8e8;
+  --journal-font: 'Caveat', cursive;
+  --journal-text: #333333;
+  --journal-text-muted: #888888;
+  --journal-highlight: #e09a5a;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+/* The paper itself */
+.journal-page {
+  position: relative;
+  width: 100%;
+  max-width: 780px;
+  max-height: 95vh;
+  background-color: var(--journal-bg);
+  /* dotted background pattern */
+  background-image: radial-gradient(rgba(0,0,0,0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0;
+  border-radius: 12px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  overflow-y: auto;
+  overflow-x: hidden;
+  transform: translateY(20px) scale(.97);
+  transition: transform .25s ease, background-color 0.3s ease;
+}
+.modal-overlay.open .journal-page { transform: translateY(0) scale(1); }
+
+/* The content wrapper inside the paper */
+.j-paper {
+  padding: 40px 40px 60px;
+  color: var(--journal-text);
+  font-family: var(--journal-font);
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+
+/* Base customizer for forms inside the paper */
+.j-paper * {
+  box-sizing: border-box;
+}
+
+.journal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  background: rgba(255,255,255,0.4);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--journal-text);
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.journal-close:hover { background: rgba(255,255,255,0.8); }
+
+.journal-actions {
+  position: absolute;
+  top: 16px;
+  right: 64px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+.journal-actions button {
+  font-family: 'Inter', sans-serif;
+}
+
+.j-header-logo {
+  font-size: 3.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+}
+
+/* Layout */
+.j-top {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 24px;
+}
+
+/* Cover */
+.j-cover-wrap {
+  width: 160px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+.cover-upload-box {
+  width: 100%;
+  aspect-ratio: 2/3;
+  background: rgba(255,255,255,0.7);
+  border: 2px dashed rgba(0,0,0,0.15);
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.cover-upload-box:hover { border-color: rgba(0,0,0,0.4); }
+.cover-upload-box input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+.cover-text {
+  text-align: center;
+  color: rgba(0,0,0,0.4);
+  font-weight: bold;
+  font-size: 1.4rem;
+  line-height: 1.1;
+  pointer-events: none;
+}
+#j-cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+  pointer-events: none;
+}
+.btn-remove-j-cover {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  cursor: pointer;
+  display: none; /* Shown by JS when hover over image */
+}
+
+.j-main-stars { display: flex; gap: 4px; font-size: 1.8rem; color: rgba(0,0,0,0.2); }
+.j-main-stars .j-star { cursor: pointer; transition: color 0.2s, transform 0.2s; }
+.j-main-stars .j-star.active { color: #f5c842; font-weight:bold; }
+.j-main-stars .j-star:hover { transform: scale(1.1); }
+
+/* Info area */
+.j-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: flex-start;
+}
+.j-field {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.j-field.inline { align-items: center; }
+.j-field label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: none;
+  color: var(--journal-text);
+  white-space: nowrap;
+}
+.j-row {
+  display: flex;
+  gap: 20px;
+}
+
+/* Inputs on the paper */
+.j-input, .j-textarea {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.1);
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 1.3rem;
+  color: var(--journal-text);
+  padding: 4px 8px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.j-input:focus, .j-textarea:focus {
+  border-bottom-color: rgba(0,0,0,0.4);
+}
+.j-textarea {
+  resize: vertical;
+  /* line effect background */
+  background-image: linear-gradient(transparent 95%, rgba(0,0,0,0.08) 100%);
+  background-size: 100% 1.4em;
+  line-height: 1.4em;
+  padding: 0 4px;
+  border-bottom: none;
+}
+input[type="date"].j-input { font-size: 1rem; font-family: 'Inter', sans-serif; }
+
+/* Radio opts */
+.j-format-opts { display: flex; gap: 12px; font-size: 1.3rem; }
+.j-format-opts label { display: flex; align-items: center; gap: 4px; cursor: pointer; font-family: inherit; font-size:1.1rem; }
+.j-format-opts input { accent-color: #333; width:16px; height:16px; }
+
+/* View text (when not editing) */
+.j-view-text {
+  font-family: inherit;
+  font-size: 1.5rem;
+  color: var(--journal-text);
+  padding: 4px 0;
+  flex: 1;
+  min-height: 2em; /* Ensure structural space even if empty */
+  border-bottom: 2px dotted rgba(0,0,0,0.15); /* The visual line */
+  line-height:1.2;
+}
+.inline-view { display:inline-block; border-bottom: 2px dotted rgba(0,0,0,0.15); flex:1; min-height:1.5em; }
+.j-textarea-view {
+  min-height: 4.2em;
+  white-space: pre-wrap;
+  background-image: linear-gradient(transparent 95%, rgba(0,0,0,0.08) 100%);
+  background-size: 100% 1.4em;
+  line-height: 1.4em;
+  border-bottom: none;
+}
+
+/* Sections */
+.j-section {
+  background: rgba(255,255,255,0.4);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.section-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 12px;
+}
+.feelings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.feelings-grid label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.1rem;
+  text-transform: none;
+  font-weight: normal;
+  color: var(--journal-text);
+}
+.feelings-grid input { accent-color: #e06060; width:16px; height:16px; }
+
+/* Split layout for remaining ratings */
+.j-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 24px;
+}
+.j-split-left { display: flex; flex-direction: column; gap: 16px; }
+.j-split-right { display: flex; flex-direction: column; gap: 12px; }
+
+.j-box {
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+/* Icon Ratings (Hearts, Peppers, Drops) */
+.rating-field { display: flex; flex-direction: column; gap: 4px; align-items:flex-start;}
+.j-icon-rating { display: flex; gap: 8px; font-size: 1.8rem; cursor:pointer;}
+.j-icon-rating span { transition: transform 0.2s; user-select: none; }
+.j-icon-rating span:hover { transform: scale(1.15); }
+
+/* Dimmed unselected items like peppers and drops */
+.j-icon-rating span.dim { filter: grayscale(1) opacity(0.3); }
+
+/* Small stars for plot, chars, etc. */
+.sub-rating-field { display: flex; align-items: center; justify-content: space-between;}
+.sub-rating-field label { flex-shrink: 0; }
+.j-icon-rating.stars.small { font-size: 1.3rem; gap: 4px; }
+.j-icon-rating.stars.small span { color: rgba(0,0,0,0.2); }
+.j-icon-rating.stars.small span.active { color: #f5c842; font-weight:bold; }
+
+.final-thoughts-field { flex-direction: column; align-items: stretch; gap: 8px; }
+
+/* Read/Edit mode logic */
+.journal-page[data-mode="view"] .j-input,
+.journal-page[data-mode="view"] .j-textarea,
+.journal-page[data-mode="view"] .j-format-opts,
+.journal-page[data-mode="view"] .feelings-grid,
+.journal-page[data-mode="view"] .stealth-field,
+.journal-page[data-mode="view"] .btn-remove-j-cover {
+  display: none !important;
+}
+
+.journal-page[data-mode="edit"] .j-view-text {
+  display: none !important;
+}
+.journal-page[data-mode="edit"] .j-icon-rating {
+  cursor: pointer;
+}
+.journal-page[data-mode="view"] .j-icon-rating {
+  cursor: default;
+}
+.journal-page[data-mode="view"] .j-icon-rating span:hover {
+  transform: none; /* Disable hover scale in view mode */
+}
+.journal-page[data-mode="view"] .cover-upload-box {
+  cursor: default;
+}
+
+/* Settings Modal */
+#settings-overlay.open .confirm-box { transform: scale(1); }
+
+/* ================================================
+   TOAST
+   ================================================ */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2000;
+  background: var(--bg-modal);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: .85rem;
+  padding: 10px 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .3s, transform .3s;
+  pointer-events: none;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.success { border-left: 3px solid var(--status-done); }
+#toast.error { border-left: 3px solid var(--status-dropped); }
+
+/* ================================================
+   CONFIRM DIALOG
+   ================================================ */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+.confirm-overlay.open { opacity: 1; pointer-events: all; }
+.confirm-box {
+  background: var(--bg-modal);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transform: scale(.95);
+  transition: transform .2s;
+}
+.confirm-overlay.open .confirm-box { transform: scale(1); }
+.confirm-icon { font-size: 2.5rem; }
+.confirm-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+.confirm-text { font-size: .875rem; color: var(--text-secondary); }
+.confirm-actions { display: flex; gap: 10px; justify-content: center; margin-top: 6px; }
+.btn-danger {
+  background: var(--status-dropped);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: .875rem;
+  font-weight: 600;
+  padding: 9px 22px;
+  transition: opacity var(--transition);
+}
+.btn-danger:hover { opacity: .85; }
+
+/* ================================================
+   RESPONSIVE
+   ================================================ */
+@media (max-width: 650px) {
+  .form-row { grid-template-columns: 1fr; }
+  .detail-layout { grid-template-columns: 1fr; }
+  .detail-cover { aspect-ratio: auto; max-height: 240px; }
+  .logo-text { display: none; }
+  .btn-add span { display: none; }
+  .btn-add { padding: 9px 10px; }
+  .stats-bar { gap: 14px; }
+  
+  /* Journal Responsiveness */
+  .j-top { flex-direction: column; gap: 24px; }
+  .j-cover-wrap { align-items: center; }
+  .j-split { grid-template-columns: 1fr; gap: 24px; }
+  .j-row { flex-direction: column; gap: 16px; }
+  .j-field { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .j-field.inline { flex-direction: row; align-items: baseline; }
+  .j-format-opts { flex-wrap: wrap; gap: 12px; }
+  .journal-page { padding: 50px 24px 30px; width: 95%; max-width: none; }
+  #journal-actions-edit { justify-content: center; width: 100%; }
+}
+@media (max-width: 480px) {
+  .books-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 14px; }
+  .journal-page { padding: 40px 16px 20px; }
+}

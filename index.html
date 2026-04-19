@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diário de Leitura</title>
+  <meta name="description" content="Seu diário pessoal de leitura. Registre livros, avaliações e acompanhe seu progresso literário." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ═══ -->
+<header class="app-header">
+  <a class="logo" href="#">
+    <span class="logo-icon">📖</span>
+    <span class="logo-text">Diário de <span>Leitura</span></span>
+  </a>
+
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input id="search-input" type="search" placeholder="Buscar título ou autor…" autocomplete="off" />
+  </div>
+
+  <div style="display:flex; gap:10px; align-items:center;">
+    <button class="btn-icon" id="btn-settings" aria-label="Personalizar ficha" title="Personalizar estilo da ficha" style="background:transparent; border:none; color:var(--text-primary); font-size:1.2rem; display:flex; align-items:center; justify-content:center;">
+      🎨
+    </button>
+    <button class="btn-add" id="btn-open-form" aria-label="Adicionar livro">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      <span>Adicionar livro</span>
+    </button>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════ STATS ═══ -->
+<section class="stats-bar" id="stats-bar" aria-label="Estatísticas">
+  <div class="stat-item"><span class="stat-value" id="stat-total">0</span><span class="stat-label">Total</span></div>
+  <div class="stat-divider"></div>
+  <div class="stat-item"><span class="stat-value" id="stat-done">0</span><span class="stat-label">Lidos</span></div>
+  <div class="stat-divider"></div>
+  <div class="stat-item"><span class="stat-value" id="stat-reading">0</span><span class="stat-label">Lendo</span></div>
+  <div class="stat-divider"></div>
+  <div class="stat-item"><span class="stat-value" id="stat-want">0</span><span class="stat-label">Quero ler</span></div>
+  <div class="stat-divider"></div>
+  <div class="stat-item"><span class="stat-value" id="stat-avg">—</span><span class="stat-label">Média ⭐</span></div>
+</section>
+
+<!-- ═══════════════════════════════════ TOOLBAR ═══ -->
+<div class="toolbar">
+  <div class="filter-group" id="filter-status" role="group" aria-label="Filtrar por status">
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="reading">📖 Lendo</button>
+    <button class="filter-btn" data-filter="done">✅ Concluído</button>
+    <button class="filter-btn" data-filter="want">🔖 Quero ler</button>
+    <button class="filter-btn" data-filter="dropped">❌ Abandonado</button>
+  </div>
+
+  <span class="toolbar-sep"></span>
+
+  <select class="sort-select" id="sort-select" aria-label="Ordenar por">
+    <option value="date-added-desc">Mais recente</option>
+    <option value="date-added-asc">Mais antigo</option>
+    <option value="title">Título A–Z</option>
+    <option value="author">Autor A–Z</option>
+    <option value="rating-desc">Melhor avaliação</option>
+    <option value="end-date-desc">Data de término</option>
+  </select>
+
+  <div class="view-toggle" role="group" aria-label="Modo de visualização">
+    <button class="view-btn active" id="view-grid" aria-label="Grade" title="Grade">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    </button>
+    <button class="view-btn" id="view-list" aria-label="Lista" title="Lista">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ MAIN ═══ -->
+<main class="main" id="main-content" aria-live="polite">
+  <!-- rendered by JS -->
+</main>
+
+<!-- ════════════════════════════ JOURNAL MODAL ═══ -->
+<div class="modal-overlay" id="journal-overlay" role="dialog" aria-modal="true">
+  <div class="journal-page" id="journal-page" data-mode="view">
+    <button class="btn-close journal-close" id="btn-close-journal" aria-label="Fechar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    
+    <div class="journal-actions" id="journal-actions-view">
+      <button class="icon-btn delete" id="btn-j-delete" aria-label="Excluir">🗑</button>
+      <button class="icon-btn edit-btn" id="btn-j-edit" aria-label="Editar">✏️</button>
+    </div>
+
+    <!-- The actual paper content -->
+    <div class="j-paper">
+      
+      <div class="j-header-logo">Ficha de Leitura</div>
+      
+      <form id="journal-form" novalidate onsubmit="return false;">
+        <input type="hidden" id="j-id" />
+        
+        <!-- Top Section -->
+        <div class="j-top">
+          <!-- Cover -->
+          <div class="j-cover-wrap">
+            <div class="cover-upload-box" id="j-cover-box">
+               <input type="file" id="j-cover-input" accept="image/*" />
+               <div class="cover-text" id="j-cover-text">Capa<br>Aqui</div>
+               <img id="j-cover-img" alt="" />
+               <button type="button" id="btn-j-remove-cover" class="btn-remove-j-cover">✕</button>
+            </div>
+            <div class="j-main-stars" id="j-main-rating">
+              <span class="j-star" data-v="1">☆</span>
+              <span class="j-star" data-v="2">☆</span>
+              <span class="j-star" data-v="3">☆</span>
+              <span class="j-star" data-v="4">☆</span>
+              <span class="j-star" data-v="5">☆</span>
+            </div>
+          </div>
+          
+          <!-- Top info -->
+          <div class="j-info">
+            <div class="j-field">
+              <label>Título:</label>
+              <input type="text" id="j-title" class="j-input" placeholder="O título do livro..." />
+              <div class="j-view-text" id="jv-title"></div>
+            </div>
+            <div class="j-field">
+              <label>Autor(a):</label>
+              <input type="text" id="j-author" class="j-input" placeholder="Quem escreveu..." />
+              <div class="j-view-text" id="jv-author"></div>
+            </div>
+            
+            <div class="j-row">
+              <div class="j-field short">
+                <label>Páginas:</label>
+                <input type="text" id="j-pages" class="j-input" placeholder="..." />
+                <div class="j-view-text" id="jv-pages"></div>
+              </div>
+              <div class="j-field">
+                <label>Formato:</label>
+                <div class="j-format-opts" id="j-format-options">
+                  <label><input type="radio" name="jFormat" value="physical"> 📚 Físico</label>
+                  <label><input type="radio" name="jFormat" value="digital"> 📱 Digital</label>
+                  <label><input type="radio" name="jFormat" value="audio"> 🎧 Audio</label>
+                </div>
+                <div class="j-view-text" id="jv-format" style="display:none; font-size:1.3rem;"></div>
+              </div>
+            </div>
+            
+            <div class="j-row">
+              <div class="j-field">
+                <label>Iniciou em:</label>
+                <input type="date" id="j-start" class="j-input" />
+                <div class="j-view-text" id="jv-start"></div>
+              </div>
+              <div class="j-field">
+                <label>Terminou em:</label>
+                <input type="date" id="j-end" class="j-input" />
+                <div class="j-view-text" id="jv-end"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Feelings Section -->
+        <div class="j-section feelings-section">
+          <label class="section-title">Meus sentimentos sobre este livro:</label>
+          <div class="feelings-grid" id="j-feelings-grid">
+            <label><input type="radio" name="jFeelings" value="loved"> Amei muito!</label>
+            <label><input type="radio" name="jFeelings" value="mixed"> Sentimentos mistos/negativos.</label>
+            <label><input type="radio" name="jFeelings" value="almost"> Quase perfeito, faltou pouco.</label>
+            <label><input type="radio" name="jFeelings" value="notworth"> Não valeu o esforço.</label>
+            <label><input type="radio" name="jFeelings" value="enjoyed"> Gostei bastante!</label>
+            <label><input type="radio" name="jFeelings" value="struggled"> Lutei para não abandonar.</label>
+            <label><input type="radio" name="jFeelings" value="enjoyable"> Legal, mas esquecível.</label>
+            <label><input type="radio" name="jFeelings" value="couldnot"> Não consegui terminar!</label>
+            <label><input type="radio" name="jFeelings" value="okay"> Nem bom, nem ruim. Ok.</label>
+          </div>
+          <div class="j-view-text" id="jv-feelings" style="display:none; margin-top:8px; font-weight:600; font-size:1.05rem;"></div>
+        </div>
+        
+        <div class="j-split">
+          <!-- Visual Ratings -->
+          <div class="j-split-left">
+            <div class="j-field rating-field">
+              <label>Romance:</label>
+              <div class="j-icon-rating" id="j-romance-rating" data-empty="♡" data-fill="🤍">
+                 <span data-v="1">♡</span><span data-v="2">♡</span><span data-v="3">♡</span><span data-v="4">♡</span><span data-v="5">♡</span>
+              </div>
+            </div>
+            <div class="j-field rating-field">
+              <label>Spice (Pimenta):</label>
+              <div class="j-icon-rating" id="j-spice-rating" data-empty="🌶️" data-fill="🌶️">
+                 <span data-v="1" class="dim">🌶️</span><span data-v="2" class="dim">🌶️</span><span data-v="3" class="dim">🌶️</span><span data-v="4" class="dim">🌶️</span><span data-v="5" class="dim">🌶️</span>
+              </div>
+            </div>
+            <div class="j-field rating-field">
+              <label>Tristeza / Lágrimas:</label>
+              <div class="j-icon-rating" id="j-sadness-rating" data-empty="💧" data-fill="💧">
+                 <span data-v="1" class="dim">💧</span><span data-v="2" class="dim">💧</span><span data-v="3" class="dim">💧</span><span data-v="4" class="dim">💧</span><span data-v="5" class="dim">💧</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Highlights & Details Ratings -->
+          <div class="j-split-right">
+            <div class="j-box">
+              <label class="section-title">Personagens Destaque</label>
+              <div class="j-field inline">
+                <label style="color:#e06060; white-space:nowrap;">♥️ Melhor:</label>
+                <input type="text" id="j-char-best" class="j-input" />
+                <div class="j-view-text inline-view" id="jv-char-best"></div>
+              </div>
+              <div class="j-field inline">
+                 <label style="white-space:nowrap;">😾 Pior:</label>
+                 <input type="text" id="j-char-worst" class="j-input" />
+                 <div class="j-view-text inline-view" id="jv-char-worst"></div>
+              </div>
+            </div>
+            
+            <div class="j-field sub-rating-field">
+              <label>Enredo (Plot):</label>
+              <div class="j-icon-rating stars small" id="j-plot-rating" data-empty="☆" data-fill="★">
+                <span data-v="1">☆</span><span data-v="2">☆</span><span data-v="3">☆</span><span data-v="4">☆</span><span data-v="5">☆</span>
+              </div>
+            </div>
+            <div class="j-field sub-rating-field">
+              <label>Personagens:</label>
+              <div class="j-icon-rating stars small" id="j-chars-rating" data-empty="☆" data-fill="★">
+                <span data-v="1">☆</span><span data-v="2">☆</span><span data-v="3">☆</span><span data-v="4">☆</span><span data-v="5">☆</span>
+              </div>
+            </div>
+            <div class="j-field sub-rating-field">
+              <label>Estilo de Escrita:</label>
+              <div class="j-icon-rating stars small" id="j-style-rating" data-empty="☆" data-fill="★">
+                <span data-v="1">☆</span><span data-v="2">☆</span><span data-v="3">☆</span><span data-v="4">☆</span><span data-v="5">☆</span>
+              </div>
+            </div>
+            <div class="j-field sub-rating-field">
+              <label>Final:</label>
+              <div class="j-icon-rating stars small" id="j-ending-rating" data-empty="☆" data-fill="★">
+                <span data-v="1">☆</span><span data-v="2">☆</span><span data-v="3">☆</span><span data-v="4">☆</span><span data-v="5">☆</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Final Thoughts -->
+        <div class="j-field final-thoughts-field">
+          <label class="section-title">Considerações Finais:</label>
+          <textarea id="j-notes" class="j-textarea" rows="4" placeholder="Escreva o que achou..."></textarea>
+          <div class="j-view-text j-textarea-view" id="jv-notes"></div>
+        </div>
+        
+        <!-- Hidden Status field since it's not on the main paper aesthetic but app needs it for filtering -->
+        <div class="j-field stealth-field" style="margin-top:20px; border-top:1px dashed var(--journal-text-muted); padding-top:10px;">
+          <label style="display:inline-block; margin-right:8px;">Status da Leitura:</label>
+          <select id="j-status" class="j-input" style="width:auto; display:inline-block;">
+            <option value="want">🔖 Quero ler</option>
+            <option value="reading">📖 Lendo</option>
+            <option value="done">✅ Concluído</option>
+            <option value="dropped">❌ Abandonado</option>
+          </select>
+          <div class="j-view-text" id="jv-status" style="font-weight:bold; font-size:0.9rem; display:inline-block;"></div>
+        </div>
+
+        <!-- Sticky Footer directly inside Paper -->
+        <div id="journal-actions-edit" style="display:none; justify-content: flex-end; gap: 10px; margin-top:30px;">
+          <button class="btn-secondary" id="btn-j-cancel" style="background:transparent; border:1px solid rgba(0,0,0,0.3); color:#333; font-family:inherit;">Cancelar</button>
+          <button class="btn-primary" id="btn-j-save" style="background:#5dbb7a; border:none; color:#fff; font-family:inherit;">Salvar Ficha</button>
+        </div>
+
+      </form>
+    </div> <!-- close j-paper -->
+  </div>
+</div>
+
+<!-- ════════════════════════════ SETTINGS MODAL ═══ -->
+<div class="modal-overlay" id="settings-overlay" role="dialog" aria-modal="true">
+  <div class="confirm-box" style="text-align:left; max-width:400px; max-height: 90vh; overflow-y: auto;">
+    <h3 style="font-family:'Playfair Display',serif; margin-bottom:16px;">🎨 Personalizar Ficha</h3>
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      
+      <div>
+        <label style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:8px;">Cor da Página</label>
+        <div id="settings-color" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom: 12px;">
+          <button class="color-btn" data-color="#fae8e8" aria-label="Rosa" style="width:32px; height:32px; border-radius:50%; border:2px solid transparent; background:#fae8e8; box-shadow: 0 0 0 1px rgba(0,0,0,0.1);"></button>
+          <button class="color-btn" data-color="#f5fae8" aria-label="Verde/Amarelo" style="width:32px; height:32px; border-radius:50%; border:2px solid transparent; background:#f5fae8; box-shadow: 0 0 0 1px rgba(0,0,0,0.1);"></button>
+          <button class="color-btn" data-color="#e8f3fa" aria-label="Azul" style="width:32px; height:32px; border-radius:50%; border:2px solid transparent; background:#e8f3fa; box-shadow: 0 0 0 1px rgba(0,0,0,0.1);"></button>
+          <button class="color-btn" data-color="#fdf4e3" aria-label="Amarelo" style="width:32px; height:32px; border-radius:50%; border:2px solid transparent; background:#fdf4e3; box-shadow: 0 0 0 1px rgba(0,0,0,0.1);"></button>
+          <button class="color-btn" data-color="#ffffff" aria-label="Branco" style="width:32px; height:32px; border-radius:50%; border:2px solid transparent; background:#ffffff; box-shadow: 0 0 0 1px rgba(0,0,0,0.1);"></button>
+          <span style="font-size:0.9rem; margin-left:4px; color:var(--text-muted)">ou</span>
+          <input type="color" id="custom-color-input" style="width:32px; height:32px; border:none; border-radius:50%; cursor:pointer; padding:0; overflow:hidden;" title="Escolher cor personalizada">
+        </div>
+      </div>
+      
+      <div>
+        <label style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:8px;">Tipografia Principal</label>
+        <select id="settings-font" style="width:100%; background:var(--bg-input); border:1px solid var(--border); color:var(--text-primary); padding:10px; border-radius:var(--radius-sm); margin-bottom: 12px;">
+          <option value="'Caveat', cursive">Manuscrita (Caveat)</option>
+          <option value="'Playfair Display', serif">Serifada Clássica</option>
+          <option value="'Inter', sans-serif">Moderna (Inter)</option>
+          <option value="'Comic Sans MS', 'Sniglet', cursive">Descontraída</option>
+          <option value="custom">-- Usar Fonte Customizada --</option>
+        </select>
+        
+        <div id="custom-font-group" style="display:none;">
+          <label style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:8px;">Nome da Fonte Customizada</label>
+          <input type="text" id="custom-font-input" placeholder="Ex: 'Roboto', sans-serif" style="width:100%; background:var(--bg-input); border:1px solid var(--border); color:var(--text-primary); padding:10px; border-radius:var(--radius-sm); font-family:inherit; font-size:0.9rem;" />
+        </div>
+      </div>
+      
+    </div>
+    
+    <div style="display:flex; justify-content:flex-end; margin-top:24px;">
+      <button class="btn-primary" id="btn-close-settings">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ CONFIRM DIALOG ═══ -->
+<div class="confirm-overlay" id="confirm-overlay" role="alertdialog" aria-modal="true">
+  <div class="confirm-box">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-title">Excluir livro?</div>
+    <div class="confirm-text">Esta ação não pode ser desfeita.</div>
+    <div class="confirm-actions">
+      <button class="btn-secondary" id="btn-confirm-cancel">Cancelar</button>
+      <button class="btn-danger" id="btn-confirm-ok">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ TOAST ═══ -->
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
